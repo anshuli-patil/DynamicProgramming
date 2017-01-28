@@ -1,28 +1,27 @@
 import sys
 import json
+import math
 from nlp.hw1.data_tokenizer import DataTokenizer
 
-labels_filename = 'train-labels.txt'
 model_filename = 'nbmodel.txt'
 output_filename = 'nboutput.txt'
-test_filename = 'test-text.txt'
 
 
-def read_model(path):
+def read_model():
     model = None
-    absolute_path_model = path + model_filename
+    absolute_path_model = model_filename
     with open(absolute_path_model, 'r') as f:
         model = json.load(f)
     f.close()
     return model
 
 
-def classify(path):
-    output_file = open(path + output_filename, 'w')
+def classify(test_filepath):
+    output_file = open(output_filename, 'w')
     output_format = '{} {} {}\n'
-    absolute_path = path + test_filename
+    absolute_path = test_filepath
     tokenizer = DataTokenizer(absolute_path)
-    model = read_model(path)
+    model = read_model()
 
     while tokenizer.has_line():
         line = tokenizer.next_line()
@@ -52,5 +51,7 @@ def predict_feature(line, model_feature1, model_feature2, feature1_name, feature
     else:
         return feature2_name
 
-
-classify('/Users/anshulip/PycharmProjects/DynamicProg/nlp/hw1/')
+'''
+python nbclassify.py /path/to/text/file
+'''
+classify(str(sys.argv[1]))

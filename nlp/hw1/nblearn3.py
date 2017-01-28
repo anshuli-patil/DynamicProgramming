@@ -5,24 +5,7 @@ import json
 import math
 
 
-labels_filename = 'train-labels.txt'
-text_filename = 'train-text.txt'
 model_filename = 'nbmodel.txt'
-
-
-def get_training_dev_split(path):
-    """
-    :param path: the directory where text data file is
-    :return: the split between lines in training set and development set
-    """
-    training_split = .75
-    absolute_path = path + text_filename
-    with open(absolute_path) as f:
-        for i, l in enumerate(f):
-            pass
-    training_lines = (i + 1) * training_split
-    dev_lines = (i + 1) - training_lines
-    return training_lines, dev_lines
 
 
 def get_genuine(labels_dict, data_id):
@@ -33,12 +16,12 @@ def get_sentiment(labels_dict, data_id):
     return labels_dict[data_id][1]
 
 
-def read_sample_data(path):
-    absolute_path = path + labels_filename
+def read_sample_data(textfile_path, labelfile_path):
+    absolute_path = labelfile_path
     label_tokenizer = DataTokenizer(absolute_path)
     labels_dict = label_tokenizer.read_labels()
 
-    absolute_path = path + text_filename
+    absolute_path = textfile_path
     tokenizer = DataTokenizer(absolute_path)
 
     occurrences_positive = defaultdict(int)
@@ -101,8 +84,8 @@ def count_feature_occurrences(line, genuine, sentiment, occurrences_positive, oc
     return truthful_data_count, deceptive_data_count, positive_data_count, negative_data_count
 
 
-def estimate_probability(path):
-    data_results = read_sample_data(path)
+def estimate_probability(textfile_path, labelfile_path):
+    data_results = read_sample_data(textfile_path, labelfile_path)
 
     positive, negative, prior_probability_pos = data_results[0]
     prior_probability_neg = 1 - prior_probability_pos
@@ -133,9 +116,11 @@ def smooth_normalize(occurrences_dict):
     if '' in occurrences_dict:
         del occurrences_dict['']
     total_count = 0
+
     for key in occurrences_dict:
         occurrences_dict[key] += 1
         total_count += occurrences_dict[key]
+
     # taking log to prevent underflow
     for key in occurrences_dict:
         occurrences_dict[key] = math.log(occurrences_dict[key]/total_count)
@@ -156,12 +141,14 @@ def print_dict(dictionary):
         print(key, dictionary[key])
 
 
-def create_model(path):
-    model = estimate_probability(path)
-    absolute_path_model = path + model_filename
+def create_model(textfile_path, labelfile_path):
+    model = estimate_probability(textfile_path, labelfile_path)
+    absolute_path_model = model_filename
     with open(absolute_path_model, 'w') as f:
         json.dump(model, f)
     f.close()
 
-
-create_model('/Users/anshulip/PycharmProjects/DynamicProg/nlp/hw1/')
+'''
+python nblearn.py /path/to/text/file /path/to/label/file
+'''
+create_model(str(sys.argv[1]), str(sys.argv[2]))

@@ -40,6 +40,7 @@ class DataTokenizer:
         :return: (string) line of review formed by space separated tokens
         """
         line.replace('.',' ')
+        line.replace('(', ' ( ')
         line.replace('\n',' ')
         line = line.lower()
         line.replace('  ', ' ')
@@ -52,6 +53,8 @@ class DataTokenizer:
             split_words[i] = word
 
             self.special_delim('.', word, split_words, i)
+            self.special_delim('-', word, split_words, i)
+            self.special_delim('"', word, split_words, i)
             self.special_delim(',', word, split_words, i)
         return split_words
 

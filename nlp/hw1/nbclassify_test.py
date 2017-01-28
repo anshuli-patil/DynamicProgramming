@@ -5,12 +5,12 @@ labels_filename = 'train-labels.txt'
 output_filename = 'nboutput.txt'
 
 
-def nb_test(path):
-    absolute_path = path + labels_filename
+def nb_test(path1, path2):
+    absolute_path = path1 + labels_filename
     label_tokenizer = DataTokenizer(absolute_path)
     labels_dict = label_tokenizer.read_labels()
 
-    absolute_path = path + output_filename
+    absolute_path = path2 + output_filename
     output_tokenizer = DataTokenizer(absolute_path)
     output_dict = output_tokenizer.read_labels()
 
@@ -18,7 +18,7 @@ def nb_test(path):
                          get_feature_f1(output_dict, labels_dict, 'negative', 1),
                          get_feature_f1(output_dict, labels_dict, 'truthful', 0),
                          get_feature_f1(output_dict, labels_dict, 'deceptive', 0)])
-    print(avg_f1)
+    print(avg_f1, get_feature_f1(output_dict, labels_dict, 'truthful', 0))
 
 
 def calculate_precision(true_positives, false_positives):
@@ -53,7 +53,7 @@ def get_feature_f1(output_dict, labels_dict, feature, feature_type):
             false_negatives += 1
         elif predicted_value[feature_type] != feature and actual_value[feature_type] != feature:
             true_negatives += 1
-    return (calculate_f1(true_positives, false_positives, false_negatives))
+    return calculate_f1(true_positives, false_positives, false_negatives)
 
 
-nb_test('/Users/anshulip/PycharmProjects/DynamicProg/nlp/hw1/')
+nb_test('/Users/anshulip/PycharmProjects/DynamicProg/nlp/hw1_copy/', '/Users/anshulip/PycharmProjects/DynamicProg/')
